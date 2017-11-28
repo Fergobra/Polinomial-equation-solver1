@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style type="text/css">
+    *{
+        margin: 0;
+        padding: 0;
+        font-family: Century Gothic;
+        margin: none;
+    }
+	body{
+		background-color: #86BCFF;
+	}
+	h1{
+		color: #FCD2ab;
+        margin-top: -1%;
+        padding-top: 2%;
+    }
+    
+    #busca{
+        display: none;
+    }
+    #divtitulo{
+        background: #A5FF8A;
+        width: 100%;
+        height: 100px;
+        margin-top: 10px;
+    }
+	.text{
+		width: 100%;
+		height: 50px;
+		background-color: White;
+		border: none;
+		color: #7CB0F5;
+		font-size: 30px;
+
+	}
+	.text:focus{
+		background-color: transparent;
+		color: whtie;
+		border-bottom: 2px solid;
+	}
+	.text:disabled{
+		background-color: white;
+		color:gray;
+	}
+	button{
+		width: 200px;
+		height: 40px;
+  		background: #ec6778;
+border-radius: 200px 200px 200px 200px;
+-moz-border-radius: 200px 200px 200px 200px;
+-webkit-border-radius: 200px 200px 200px 200px;
+border: 0px solid #000000;   
+  		font-size: 20px;
+	}
+	button:hover {
+ 		background: #377F8A;
+	}
+	button:active{
+		box-shadow: 0px 2px 0px 0px #192B38;
+	}
+	h1{
+		text-align: center;
+	}
+	input::placeholder { color: white; }
+	h3{
+		color: #FFFFFF
+	}
+	#res{
+		color: yellow;
+		font-size: 26px;
+	}
+    .conbot{
+        float: left;
+        position: fixed;
+        width: 60%;
+        height: 100%;
+        margin-left: 20%;
+        margin-right: 20%;
+        text-align: center;
+        overflow: auto;
+    }
+    .botmat{
+        display: none;
+    }
+    h2{
+        color: #ADD9FE;
+    }
+</style>
+<script type="text/javascript">
+	function ejemplo(){
+		document.getElementById('ecu').value ="x^3+2x^2-5x-6"
+	}
+
+	var terminos=[];
+	var oTermino=[];
+	var oTerminoDerivados=[];
+	var raiz=[];
+	function calcula(){
+		var ecu=document.getElementById('ecu').value
+		console.log(ecu)
+		term(ecu)
+		generarar()
+		ver();
+		if(document.getElementById("busca").disabled == false){
+			raiz[0]=newtonRapson(document.getElementById("busca").value);
+
+		}else{
+			for(var d=-10;d<11;d++){
+			raiz[d]=newtonRapson(d);
+		}
+		}
+
+		fin()
+
+	}
+	function fin(){
+		var g=document.getElementById("res")
+		var s="";
+		if(document.getElementById("busca").disabled == false){
+            document.busca.value = 1
+			s=raiz[0];
+		}else{
+		for(var t=-10;t<raiz.length;t++){
+
+			s=s+raiz[t]+"<br>";
+
+		}
+		}
+
+		g.innerHTML=s
+	}
+	function derivar(term){
+
+	var variable=""
+	var coeficiente,exponente
+	console.log(term.coeficiente+"*"+term.exponente)
+		if(term.variable==undefined){
+			console.log("variable es undefined")
+			coeficiente=0
+			exponente=0;
+		}else{
+			coeficiente=term.coeficiente*term.exponente
+			exponente=term.exponente-1
+
+			if(exponente>0){
+				variable=term.variable
+			}
+
+		}
+		var nvterm=""
+		nvterm=nvterm+coeficiente
+		nvterm=nvterm+variable
+		if(term.exponente>1){
+			nvterm=nvterm+"^"
+		}
+		if(exponente!=0){
+			nvterm=nvterm+exponente
+		}
+
+
+		console.log("creo termino:"+nvterm)
+		var o=new termino(nvterm)
+		return o
+
+	}
+
+	function term(ec){
+		var contador=0;
+		terminos[contador]=new Array();
+
+		for(var i=0;i<ec.length;i++){
+			if(i!=0 && (ec[i]=='-' || ec[i]=='+')){
+					contador++;
+					terminos[contador]=new Array()
+
+			}
+				terminos[contador]=terminos[contador]+ec[i];
+		}
+
+	}
+	function generarar(){
+		for(var i=0;i<terminos.length;i++){
+
+			oTermino[i]=new termino(terminos[i]);
+			oTerminoDerivados[i]=(derivar(oTermino[i]))
+		}
+	}
+	function ver(){
+		for(var i=0;i<oTermino.length;i++){
+			console.log("Termino normal")
+			console.log(oTermino[i].coeficiente)
+			console.log(oTermino[i].variable)
+			console.log(oTermino[i].exponente)
+			console.log("Termino derivado")
+			console.log(oTerminoDerivados[i].coeficiente)
+			console.log(oTerminoDerivados[i].variable)
+			console.log(oTerminoDerivados[i].exponente)
+		}
+
+	}
+
+	function newtonRapson(valorInicial){
+		var fdex=0
+		var fdevx=0
+		var rep;
+		for(var i=0;i<10;i++){
+
+			fdex=0
+			fdevx=0
+			for(var j=0;j<oTermino.length;j++){
+
+				fdex=fdex+(fx(oTermino[j],valorInicial))
+				fdevx=fdevx+(fx(oTerminoDerivados[j],valorInicial))
+				//console.log(fx(oTermino[j],valorInicial))
+			}
+			//console.log("f(x)= "+fdex)
+			//console.log("f(x)'= "+fdevx)
+			valorInicial=valorInicial-(fdex/fdevx)
+
+
+		}
+		console.log("raiz= "+valorInicial)
+		return valorInicial
+
+
+
+}
+	function fx(terminox,valor){
+		if (terminox.variable==undefined){
+			return parseInt(terminox.coeficiente)
+		}
+
+		var res=Math.pow(valor,terminox.exponente)
+		res=res*terminox.coeficiente;
+		//console.log("res: "+res)
+		parseInt(res)
+		return res;
+
+	}
+
+function v(){
+	for(var i=0;i<oTermino.length;i++)
+		console.log(oTermino[i].coeficiente)
+}
+	class termino{
+
+		constructor(t) {
+
+		var ter=t
+		var numeros="+-0123456789^";
+		console.log("aqui es:"+ter[0])
+    		/*if(ter[0]=="-" || ter[0]=="+"){
+    			this.signo=ter[0];
+    			ter=ter.substring(1)
+    		}else{
+    			this.signo="+";
+    		}*/
+    		this.coeficiente=""
+    		while(numeros.indexOf(ter[0])!=-1){
+    			this.coeficiente=this.coeficiente+ter[0];
+    			ter=ter.substring(1)
+    		}
+    		this.variable=ter[0]
+    		ter=ter.substring(1)
+    		ter=ter.substring(1)
+    		this.exponente="";
+    		for (var i = 0; i < ter.length; i++) {
+    			this.exponente=this.exponente+ter[0];
+    			ter=ter.substring(1)
+    		}
+    		if(this.coeficiente==""){
+    			this.coeficiente=1;
+    		}
+    		if(this.exponente==""){
+    			this.exponente=1;
+    		}
+
+
+
+  		}
+
+
+	}
+	function val(x){
+
+		if(x=="no"){
+
+			document.getElementById("busca").disabled = false;
+		}else{
+			document.getElementById("busca").disabled = true;
+		}
+	}
+	function coloca(){
+		var d=document.getElementById('ecu').value
+		d=d+"^"
+		document.getElementById('ecu').value=d
+	}
+
+</script>
+<head>
+
+	<title>Raices</title>
+</head>
+<body>
+<div id="divtitulo">
+	<h1>Polinomial equation solver</h1>
+</div>
+	<div class="conbot">
+		<input disabled="disabled" style="width: 50%"  class="
+		text" id="busca" type="text" placeholder="valor inicial">
+		<br>
+		<br>
+		<button onclick="ejemplo()" class="botmat">
+			ejemplo
+		</button>
+		<button onclick="coloca()">exponente ^</button>
+		<input id="ecu" class="text" type="text" placeholder="x^3+2x^2-5x-6">
+	<br>
+	<br>
+	<button onclick="calcula()" id="btncalc">Calcular raices</button>
+	<br>
+        <h2>Gómez Bravo Julian Fernando<br>
+        Olmos Rodriguez David Alejandro<br>
+        Sánchez Rodriguez Christian Alfonso</h2>
+	<br>
+	<div id="res">
+
+	</div>
+	</div>
+	
+</body>
+</html>
